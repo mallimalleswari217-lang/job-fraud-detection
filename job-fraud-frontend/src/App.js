@@ -2,13 +2,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
+const API_BASE = process.env.REACT_APP_API_URL;
+
 function App() {
   const [jobs, setJobs] = useState([]);
   const [title, setTitle] = useState("");
   const [company, setCompany] = useState("");
   const [description, setDescription] = useState("");
   const [link, setLink] = useState("");
-  const [editingJobId, setEditingJobId] = useState(null); // track which job is being edited
+  const [editingJobId, setEditingJobId] = useState(null);
   const [editFields, setEditFields] = useState({ title: "", company: "", description: "", link: "" });
 
   useEffect(() => {
@@ -17,17 +19,16 @@ function App() {
 
   const fetchJobs = async () => {
     try {
-      const res = await axios.get("http://localhost:4000/fraud-check");
+      const res = await axios.get(`${API_BASE}/fraud-check`);
       setJobs(res.data);
     } catch (err) {
       console.error("Error fetching jobs:", err);
     }
   };
 
-  // Add job
   const addJob = async () => {
     try {
-      const res = await axios.post("http://localhost:4000/fraud-check", {
+      const res = await axios.post(`${API_BASE}/fraud-check`, {
         title,
         company,
         description,
@@ -43,7 +44,6 @@ function App() {
     }
   };
 
-  // Start editing a job
   const startEdit = (job) => {
     setEditingJobId(job._id);
     setEditFields({
@@ -54,10 +54,9 @@ function App() {
     });
   };
 
-  // Save updated job
   const saveEdit = async (id) => {
     try {
-      const res = await axios.put(`http://localhost:4000/fraud-check/${id}`, editFields);
+      const res = await axios.put(`${API_BASE}/fraud-check/${id}`, editFields);
       setJobs(jobs.map((job) => (job._id === id ? res.data.job : job)));
       setEditingJobId(null);
       setEditFields({ title: "", company: "", description: "", link: "" });
@@ -68,7 +67,7 @@ function App() {
 
   const deleteJob = async (id) => {
     try {
-      await axios.delete(`http://localhost:4000/fraud-check/${id}`);
+      await axios.delete(`${API_BASE}/fraud-check/${id}`);
       setJobs(jobs.filter((job) => job._id !== id));
     } catch (err) {
       console.error("Error deleting job:", err);
